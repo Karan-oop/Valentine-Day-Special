@@ -2,8 +2,6 @@
    Global Styles & Reset
    =========================== */
 
-/*Refactor global styles , add new styles and fixing bugs*/
-
 * {
     margin: 0;
     padding: 0;
@@ -653,5 +651,6 @@ body {
     font-size: 12px;
     color: #b23a48;
 }
+
 
 

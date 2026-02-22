@@ -617,54 +617,92 @@ function clearAllData() {
    Valentine Countdown
    =========================== */
 
-// Initialize a countdown to a target date string like '2026-02-14T00:00:00'
-function initValentineCountdown(targetDateStr) {
-    const cdDays = document.getElementById('cdDays');
-    const cdHours = document.getElementById('cdHours');
-    const cdMinutes = document.getElementById('cdMinutes');
-    const cdSeconds = document.getElementById('cdSeconds');
+// Get the next upcoming Valentine's Day date string
+function getNextValentineDate() {
+    var now = new Date();
+    var year = now.getFullYear();
+
+    // Build this year's Valentine's Day at midnight
+    var thisValentine = new Date(year, 1, 14, 0, 0, 0); // month is 0-indexed: 1 = February
+
+    // If today is already past Feb 14, jump to next year
+    if (now >= thisValentine) {
+        thisValentine = new Date(year + 1, 1, 14, 0, 0, 0);
+    }
+
+    return thisValentine;
+}
+
+// Initialize countdown to a Date object
+function initValentineCountdown() {
+    var cdDays = document.getElementById('cdDays');
+    var cdHours = document.getElementById('cdHours');
+    var cdMinutes = document.getElementById('cdMinutes');
+    var cdSeconds = document.getElementById('cdSeconds');
 
     if (!cdDays || !cdHours || !cdMinutes || !cdSeconds) return;
 
-    const target = new Date(targetDateStr);
+    // Get the correct target date (this year or next year automatically)
+    var target = getNextValentineDate();
 
-    function update() {
-        const now = new Date();
-        let diff = Math.max(0, target - now);
+    var iv = setInterval(function() {
+        var now = new Date();
+        var diff = target - now;
 
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        diff -= days * (1000 * 60 * 60 * 24);
+        // Countdown finished — move to next year automatically
+        if (diff <= 0) {
+            clearInterval(iv);
+            // Reset target to next Valentine's Day and restart
+            target = getNextValentineDate();
+            initValentineCountdown();
+            return;
+        }
 
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        diff -= hours * (1000 * 60 * 60);
+        var days    = Math.floor(diff / (1000 * 60 * 60 * 24));
+        diff       -= days * (1000 * 60 * 60 * 24);
 
-        const minutes = Math.floor(diff / (1000 * 60));
-        diff -= minutes * (1000 * 60);
+        var hours   = Math.floor(diff / (1000 * 60 * 60));
+        diff       -= hours * (1000 * 60 * 60);
 
-        const seconds = Math.floor(diff / 1000);
+        var minutes = Math.floor(diff / (1000 * 60));
+        diff       -= minutes * (1000 * 60);
 
-        cdDays.textContent = String(days);
-        cdHours.textContent = String(hours).padStart(2, '0');
+        var seconds = Math.floor(diff / 1000);
+
+        cdDays.textContent    = String(days);
+        cdHours.textContent   = String(hours).padStart(2, '0');
         cdMinutes.textContent = String(minutes).padStart(2, '0');
         cdSeconds.textContent = String(seconds).padStart(2, '0');
-    }
 
-    update();
-    const iv = setInterval(function() {
-        update();
-        // Stop interval when reached
-        if (new Date() >= target) clearInterval(iv);
     }, 1000);
+
+    // Run immediately so there's no 1-second blank delay on load
+    (function runNow() {
+        var now  = new Date();
+        var diff = Math.max(0, target - now);
+
+        var days    = Math.floor(diff / (1000 * 60 * 60 * 24));
+        diff       -= days * (1000 * 60 * 60 * 24);
+
+        var hours   = Math.floor(diff / (1000 * 60 * 60));
+        diff       -= hours * (1000 * 60 * 60);
+
+        var minutes = Math.floor(diff / (1000 * 60));
+        diff       -= minutes * (1000 * 60);
+
+        var seconds = Math.floor(diff / 1000);
+
+        cdDays.textContent    = String(days);
+        cdHours.textContent   = String(hours).padStart(2, '0');
+        cdMinutes.textContent = String(minutes).padStart(2, '0');
+        cdSeconds.textContent = String(seconds).padStart(2, '0');
+    })();
 }
 
-// Auto-init countdown when on valentine page
+// Auto-init countdown on valentine page
 document.addEventListener('DOMContentLoaded', function() {
-    const path = window.location.pathname.toLowerCase();
+    var path = window.location.pathname.toLowerCase();
     if (path.endsWith('valentine.html')) {
-        // Target: 14 Feb 2026 at 00:00 local time
-        initValentineCountdown('2026-02-14T00:00:00');
+        initValentineCountdown();
     }
 });
-
-
-
